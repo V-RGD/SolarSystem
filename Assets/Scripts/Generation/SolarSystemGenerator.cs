@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using CelestialBodies;
 using Generation;
+using JobQueries;
 using MeshGeneration;
 using NaughtyAttributes;
-using TerrainGeneration;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -45,8 +47,8 @@ public class SolarSystemGenerator : MonoBehaviour
     [SerializeField] Sun sun;
     List<Planet> _planets = new List<Planet>();
 
-    [SerializeField, Range(0f, 1f)] float timeScale = 1;
-    
+    [SerializeField, Range(0f, 10f)] float timeScale = 1;
+
     void Start()
     {
         GenerateSun(sunSize);
@@ -57,31 +59,16 @@ public class SolarSystemGenerator : MonoBehaviour
 
     void GenerateSun(float size) => sun.SetSize(size);
 
-    public struct PlanetData
-    {
-        //planet object settings
-        public float Size;
-        public float Distance;
-        public float Tilt;
-        public float RotationSpeed;
-
-        public PlanetData(float size, float distance, float tilt, float rotationSpeed)
-        {
-            Size = size;
-            Distance = distance;
-            Tilt = tilt;
-            RotationSpeed = rotationSpeed;
-        }
-    }
 
     void GeneratePlanets()
     {
         //setup planets settings
-        List<PlanetCreationJob> planetQueries = new List<PlanetCreationJob>();
-        List<PlanetData> planetDatas = new List<PlanetData>();
+        // List<PlanetCreationJob> planetQueries = new List<PlanetCreationJob>();
+        List<Planet.TransformData> planetDatas = new List<Planet.TransformData>();
+        List<Planet.GlobalWeatherConditions> weatherConditions = new List<Planet.GlobalWeatherConditions>();
 
-        PlanetCreationJob.TerrainSettings terrainSettings =
-            new PlanetCreationJob.TerrainSettings(planetResolution, planetElevationNoiseSettings);
+        // PlanetCreationJob.TerrainSettings terrainSettings =
+        //     new PlanetCreationJob.TerrainSettings(planetResolution, planetElevationNoiseSettings);
 
         float lastPlanetDist = 0;
         float lastPlanetSize = sunSize;
@@ -98,43 +85,75 @@ public class SolarSystemGenerator : MonoBehaviour
 
             float rotationSpeed = Mathf.Lerp(planetRotationSpeed.min, planetRotationSpeed.max,
                 planetRotationSpeedRepartition.Evaluate(SRnd.NextFloat()));
-            
+
             //adds planet generation data
-            planetDatas.Add(new PlanetData(size, distance, tilt, rotationSpeed));
+            planetDatas.Add(new Planet.TransformData(size, distance, tilt, rotationSpeed));
 
             float t = planetTemperatureByDistance.Evaluate(Mathf.InverseLerp(0, distForZeroTemperature, distance));
 
-            PlanetCreationJob.GlobalConditions conditions = new PlanetCreationJob.GlobalConditions(t, SRnd.NextFloat(),
+            Planet.GlobalWeatherConditions conditions = new Planet.GlobalWeatherConditions(t, SRnd.NextFloat(),
                 SRnd.NextFloat(), planetElevationNoiseSettings.multiplier);
 
-            PlanetCreationJob.OutputData outputData = new PlanetCreationJob.OutputData();
+            weatherConditions.Add(conditions);
 
-            PlanetCreationJob newJob = new PlanetCreationJob(terrainSettings, conditions, outputData);
-            planetQueries.Add(newJob);
+            // PlanetCreationJob.OutputData outputData = new PlanetCreationJob.OutputData();
+
+            // PlanetCreationJob newJob = new PlanetCreationJob(terrainSettings, conditions);
+            // planetQueries.Add(newJob);
 
             lastPlanetSize = size;
             lastPlanetDist = distance;
         }
 
-        NativeArray<JobHandle> handles = new NativeArray<JobHandle>(planetQueries.Count, Allocator.TempJob);
-        
+        // NativeArray<JobHandle> handles = new NativeArray<JobHandle>(planetQueries.Count, Allocator.TempJob);
+
         //runs all planet queries in parallel
-        for (int i = 0; i < planetQueries.Count; i++)
+        for (int i = 0; i < planetDatas.Count; i++)
         {
-            // handles[i] = planetQueries[i].Schedule();
-            planetQueries[i].Execute();
+            CreatePlanetAsync(planetDatas[i], weatherConditions[i]);
         }
+
+        Debug.Log("start finised");
+    }
+
+    async void CreatePlanetAsync(Planet.TransformData data, Planet.GlobalWeatherConditions weatherConditions)
+    {
+        Planet planet = Instantiate(planetPrefab, Vector3.zero, Quaternion.identity);
+        planet.SetTransformData(data);
+
+        //generate ico
+        Icosahedron ico = Icosahedron.GenerateIcoSphere(planetResolution);
+        NativeArray<float> noiseValues = new NativeArray<float>(ico.Vertices.Length, Allocator.TempJob);
+        NativeArray<Vector3> vertices = ico.Vertices;
+
+        Planet.MeshData meshData = new Planet.MeshData(ico, noiseValues.ToArray());
+        planet.GenerateMesh(meshData);
+
+        Debug.Log("Planet instance created");
+
+        //compute and apply elevation
+        Noise3DMapJob job = new Noise3DMapJob(planetElevationNoiseSettings, noiseValues, vertices);
+        await GenerateNoise(job);
+        for (int i = 0; i < ico.Vertices.Length; i++) ico.Vertices[i] *= (1 + noiseValues[i]);
+
+        //compute biome and weather values
+        Planet.VertexWeatherConditions vertexWeatherConditions =
+            BiomeGenerator.Instance.GeneratePlanetBiomes(weatherConditions, meshData);
+        planet.SetVertexWeatherConditions(vertexWeatherConditions);
         
-        JobHandle.CompleteAll(handles);
-        
-        // Debug.Log("all planets are created");
-        
-        //then creates the planets
-        for (int i = 0; i < planetQueries.Count; i++)
-        {
-            Planet planet = Instantiate(planetPrefab, Vector3.zero, Quaternion.identity);
-            planet.Init(planetDatas[i]);
-            planet.GeneratePlanet(planetQueries[i].Output[0]);
-        }
+        Debug.Log("Planet Generated");
+    }
+
+    Task GenerateNoise(Noise3DMapJob job)
+    {
+        JobHandle handle = job.Schedule();
+        handle.Complete();
+        return Task.CompletedTask;
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, distForZeroTemperature);
     }
 }

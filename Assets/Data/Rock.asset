@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   label: 
   vertexColor: {r: 0.3584906, g: 0.308646, b: 0.26210397, a: 1}
-  temperature: 0.2
+  temperature: 0.3
   habitability: 0

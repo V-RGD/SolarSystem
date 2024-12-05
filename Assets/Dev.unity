@@ -163,12 +163,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e1311769a64babaf2a097694f9df41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  biomes:
-  - {fileID: 11400000, guid: 8fd5734a240d7de4d9c525b2843d6cda, type: 2}
+  <Biomes>k__BackingField:
+  - {fileID: 11400000, guid: 4761f73fcac6a1043b51a08dde3d87bd, type: 2}
+  - {fileID: 11400000, guid: e45662055d5d3da4683d35abbc366d91, type: 2}
   - {fileID: 11400000, guid: 2441dc643cbd88c4799e7cdbfa856f2d, type: 2}
   - {fileID: 11400000, guid: d1cdd9504e7955d49a2f9cb3ba68e185, type: 2}
-  - {fileID: 11400000, guid: e45662055d5d3da4683d35abbc366d91, type: 2}
-  - {fileID: 11400000, guid: 4761f73fcac6a1043b51a08dde3d87bd, type: 2}
+  - {fileID: 11400000, guid: 8fd5734a240d7de4d9c525b2843d6cda, type: 2}
   - {fileID: 11400000, guid: dc71f0945a399184cb2098e5827e4785, type: 2}
   temperatureByLatitude:
     serializedVersion: 2
@@ -968,15 +968,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sunSize: 2
-  planetsToSpawn: 1
-  distForZeroTemperature: 20
+  planetsToSpawn: 7
+  distForZeroTemperature: 32
   planetSizeRange:
     min: 0.1
     max: 0.5
   distanceRatioBetweenPlanets:
-    min: 5
-    max: 7
-  planetResolution: 5
+    min: 7
+    max: 10
+  planetResolution: 4
   planetElevationNoiseSettings:
     freq: 5
     octaves: 3
