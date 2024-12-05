@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using CelestialBodies;
 using Generation;
+using MeshGeneration;
 using NaughtyAttributes;
+using TerrainGeneration;
+using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -23,7 +26,7 @@ public class SolarSystemGenerator : MonoBehaviour
     [Header("Planet Settings")] [SerializeField, Range(0, 8)]
     int planetResolution = 7;
 
-    [SerializeField] NoiseMapParams planetElevationMap;
+    [SerializeField] NoiseMapSettings planetElevationNoiseSettings;
 
     [SerializeField, CurveRange(0, 0, 1, 1)]
     AnimationCurve planetTemperatureByDistance;
@@ -43,7 +46,7 @@ public class SolarSystemGenerator : MonoBehaviour
     List<Planet> _planets = new List<Planet>();
 
     [SerializeField, Range(0f, 1f)] float timeScale = 1;
-
+    
     void Start()
     {
         GenerateSun(sunSize);
@@ -54,108 +57,84 @@ public class SolarSystemGenerator : MonoBehaviour
 
     void GenerateSun(float size) => sun.SetSize(size);
 
-    // void GeneratePlanets()
-    // {
-    //     //setup planets settings
-    //     List<PlanetQuery> playerQueries = new List<PlanetQuery>();
-    //         
-    //     float lastPlanetDist = 0;
-    //     float lastPlanetSize = sunSize;
-    //         
-    //     for (int i = 0; i < planetsToSpawn; i++)
-    //     {
-    //         float planetSize = Random.Range(planetSizeRange.min, planetSizeRange.max);
-    //         
-    //         //puts it at a safe distance from the last planet (or sun, if none)
-    //         float distance = lastPlanetDist + (distanceRatioBetweenPlanets.RandomValue() * lastPlanetSize);
-    //         lastPlanetDist = distance;
-    //         
-    //         float tilt = planetTiltRepartition.Evaluate(Random.value) * 90;
-    //         if (SRnd.NextBool()) tilt *= -1;
-    //         
-    //         float rotationSpeed = Mathf.Lerp(planetRotationSpeed.min, planetRotationSpeed.max,
-    //             planetRotationSpeedRepartition.Evaluate(SRnd.NextFloat()));
-    //         
-    //         float t = planetTemperatureByDistance.Evaluate(Mathf.InverseLerp(0, distForZeroTemperature, distance));
-    //         
-    //         PlanetQuery newJob = new PlanetQuery();
-    //         newJob.
-    //         
-    //         playerQueries.Add(newJob);
-    //         
-    //         lastPlanetSize = planetSize;
-    //     }
-    // }
-
-    void GeneratePlanets()
+    public struct PlanetData
     {
-        List<PlanetCreationJob> planetCreationJobs = new List<PlanetCreationJob>();
-    
-        float lastPlanetDist = 0;
-        float lastPlanetSize = sunSize;
-    
-        for (int i = 0; i < planetsToSpawn; i++)
-        {
-            float planetSize = Random.Range(planetSizeRange.min, planetSizeRange.max);
-    
-            //puts it at a safe distance from the last planet (or sun, if none)
-            float distance = lastPlanetDist + (distanceRatioBetweenPlanets.RandomValue() * lastPlanetSize);
-            lastPlanetDist = distance;
-    
-            float tilt = planetTiltRepartition.Evaluate(Random.value) * 90;
-            if (SRnd.NextBool()) tilt *= -1;
-    
-            float rotationSpeed = Mathf.Lerp(planetRotationSpeed.min, planetRotationSpeed.max,
-                planetRotationSpeedRepartition.Evaluate(SRnd.NextFloat()));
-    
-            float t = planetTemperatureByDistance.Evaluate(Mathf.InverseLerp(0, distForZeroTemperature, distance));
-    
-            PlanetCreationJob newJob = new PlanetCreationJob(planetSize, distance, tilt, rotationSpeed, t,
-                planetResolution, planetElevationMap, planetPrefab);
-            planetCreationJobs.Add(newJob);
-    
-            lastPlanetSize = planetSize;
-        }
-        
-        foreach (var job in planetCreationJobs)
-        {
-            job.Execute();
-            // JobHandle handle = job.Schedule();
-        }
-    }
-    
-    public class PlanetCreationJob : IJob
-    {
-        public float PlanetSize;
+        //planet object settings
+        public float Size;
         public float Distance;
         public float Tilt;
         public float RotationSpeed;
-        public float Temperature;
-        public int Resolution;
-    
-        public PlanetCreationJob(float planetSize, float distance, float tilt, float rotationSpeed, float temperature,
-            int resolution, NoiseMapParams elevationParams, Planet planetPrefab)
+
+        public PlanetData(float size, float distance, float tilt, float rotationSpeed)
         {
-            PlanetSize = planetSize;
+            Size = size;
             Distance = distance;
             Tilt = tilt;
             RotationSpeed = rotationSpeed;
-            this.ElevationParams = elevationParams;
-            this.PlanetPrefab = planetPrefab;
-            Temperature = temperature;
-            Resolution = resolution;
+        }
+    }
+
+    void GeneratePlanets()
+    {
+        //setup planets settings
+        List<PlanetCreationJob> planetQueries = new List<PlanetCreationJob>();
+        List<PlanetData> planetDatas = new List<PlanetData>();
+
+        PlanetCreationJob.TerrainSettings terrainSettings =
+            new PlanetCreationJob.TerrainSettings(planetResolution, planetElevationNoiseSettings);
+
+        float lastPlanetDist = 0;
+        float lastPlanetSize = sunSize;
+
+        for (int i = 0; i < planetsToSpawn; i++)
+        {
+            float size = Random.Range(planetSizeRange.min, planetSizeRange.max);
+
+            //puts it at a safe distance from the last planet (or sun, if none)
+            float distance = lastPlanetDist + (distanceRatioBetweenPlanets.RandomValue() * lastPlanetSize);
+
+            float tilt = planetTiltRepartition.Evaluate(Random.value) * 90;
+            if (SRnd.NextBool()) tilt *= -1;
+
+            float rotationSpeed = Mathf.Lerp(planetRotationSpeed.min, planetRotationSpeed.max,
+                planetRotationSpeedRepartition.Evaluate(SRnd.NextFloat()));
+            
+            //adds planet generation data
+            planetDatas.Add(new PlanetData(size, distance, tilt, rotationSpeed));
+
+            float t = planetTemperatureByDistance.Evaluate(Mathf.InverseLerp(0, distForZeroTemperature, distance));
+
+            PlanetCreationJob.GlobalConditions conditions = new PlanetCreationJob.GlobalConditions(t, SRnd.NextFloat(),
+                SRnd.NextFloat(), planetElevationNoiseSettings.multiplier);
+
+            PlanetCreationJob.OutputData outputData = new PlanetCreationJob.OutputData();
+
+            PlanetCreationJob newJob = new PlanetCreationJob(terrainSettings, conditions, outputData);
+            planetQueries.Add(newJob);
+
+            lastPlanetSize = size;
+            lastPlanetDist = distance;
+        }
+
+        NativeArray<JobHandle> handles = new NativeArray<JobHandle>(planetQueries.Count, Allocator.TempJob);
+        
+        //runs all planet queries in parallel
+        for (int i = 0; i < planetQueries.Count; i++)
+        {
+            // handles[i] = planetQueries[i].Schedule();
+            planetQueries[i].Execute();
         }
         
-        public Planet PlanetPrefab;
-        public NoiseMapParams ElevationParams;
-    
-        public void Execute()
+        JobHandle.CompleteAll(handles);
+        
+        // Debug.Log("all planets are created");
+        
+        //then creates the planets
+        for (int i = 0; i < planetQueries.Count; i++)
         {
-            Planet planet = Instantiate(PlanetPrefab, Vector3.zero, Quaternion.identity);
-            planet.Init(PlanetSize, Distance, Tilt, RotationSpeed);
-            planet.ElevationParams = ElevationParams;
-            planet.GeneratePlanet(Resolution, Temperature);
-            Debug.Log("job completed");
+            Planet planet = Instantiate(planetPrefab, Vector3.zero, Quaternion.identity);
+            planet.Init(planetDatas[i]);
+            planet.GeneratePlanet(planetQueries[i].Output[0]);
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace MeshGeneration
 {
-    public class Icosahedron
+    public struct Icosahedron
     {
-        public int[] Indices;
-        public Vector3[] Vertices;
+        public NativeArray<int> Indices;
+        public NativeArray<Vector3> Vertices;
 
         public Mesh ToMesh()
         {
@@ -47,10 +47,9 @@ namespace MeshGeneration
             for (int i = 0; i < 5; i++)
             {
                 Vector3 v = Vector3.forward;
-                //rotate x
-                v = Quaternion.AngleAxis(angle, Vector3.right) * v;
-                //rotate y
-                v = Quaternion.AngleAxis((float)360 / 5 * i + (float)360 / 10, Vector3.up) * v;
+                
+                v = Quaternion.AngleAxis(angle, Vector3.right) * v;  //rotate x
+                v = Quaternion.AngleAxis((float)360 / 5 * i + (float)360 / 10, Vector3.up) * v; //rotate y
                 verts.Add(v);
             }
 
@@ -94,8 +93,8 @@ namespace MeshGeneration
 
             return new Icosahedron()
             {
-                Vertices = verts.ToArray(),
-                Indices = indices.ToArray(),
+                Vertices = verts.ToNativeArray(Allocator.TempJob),
+                Indices = indices.ToNativeArray(Allocator.TempJob),
             };
         }
 
@@ -122,9 +121,11 @@ namespace MeshGeneration
 
         public void Subdivide()
         {
-            int[] newIndices = new int[Indices.Length * 4];
-            Vector3[] newVerts = new Vector3[Vertices.Length * 2];
+            NativeArray<int> newIndices = new NativeArray<int>(Indices.Length / 3 * 12, Allocator.TempJob);
+            NativeArray<Vector3> newVerts = new NativeArray<Vector3>(Indices.Length / 3 * 6, Allocator.TempJob);
 
+            int indiceIndex = 0;
+            
             int vertexArrayIndex = 0;
 
             //for each tri
@@ -142,10 +143,11 @@ namespace MeshGeneration
 
                 //add new vertices to the array
                 int vertexIndex = vertexArrayIndex;
+                
                 newVerts[vertexArrayIndex] = a;
                 newVerts[vertexArrayIndex+1] = b;
                 newVerts[vertexArrayIndex+2] = c;
-                newVerts[vertexArrayIndex+3] = y;
+                newVerts[vertexArrayIndex+3] = x;
                 newVerts[vertexArrayIndex+4] = y;
                 newVerts[vertexArrayIndex+5] = z;
                 vertexArrayIndex += 6;
@@ -154,7 +156,6 @@ namespace MeshGeneration
 
                 //connects new triangles
                 int[] indicesToAdd = { 0, 3, 5, 3, 1, 4, 3, 4, 5, 5, 4, 2 };
-                int indiceIndex = i * 4;
                 foreach (int index in indicesToAdd)
                 {
                     newIndices[indiceIndex] = index + vertexIndex;
@@ -162,21 +163,11 @@ namespace MeshGeneration
                 }
             }
 
-            Indices = new int[newIndices.Length];
-            Vertices = new Vector3[newVerts.Length];
+            Indices = new NativeArray<int>(newIndices.Length, Allocator.TempJob);
+            Vertices = new NativeArray<Vector3>(newVerts.Length, Allocator.TempJob);
 
-            for (int i = 0; i < newIndices.Length; i++)
-            {
-                Indices[i] = newIndices[i];
-            }
-            
-            for (int i = 0; i < newVerts.Length; i++)
-            {
-                Vertices[i] = newVerts[i];
-            }
-
-            // foreach (int newIndex in newIndices) Indices.Add(newIndex);
-            // foreach (Vector3 newVertex in newVerts) Vertices.Add(newVertex);
+            for (int i = 0; i < newIndices.Length; i++) Indices[i] = newIndices[i];
+            for (int i = 0; i < newVerts.Length; i++) Vertices[i] = newVerts[i];
         }
     }
 }

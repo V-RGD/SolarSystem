@@ -977,9 +977,9 @@ MonoBehaviour:
     min: 5
     max: 7
   planetResolution: 5
-  planetElevationMap:
+  planetElevationNoiseSettings:
     freq: 5
-    octaves: 4
+    octaves: 3
     multiplier: 0.025
     seed: 0
   planetTemperatureByDistance:
