@@ -1,6 +1,5 @@
 ﻿using System;
 using MeshGeneration;
-using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,6 +9,12 @@ namespace CelestialBodies
     {
         [SerializeField] bool randomizeEclipticPos;
         [SerializeField] MeshFilter waterMeshFilter;
+        [SerializeField] MeshFilter atmosphereMeshFilter;
+
+        [Header("Atmosphere")] 
+        [SerializeField] Material lightAtmosphereMat;
+        [SerializeField] Material mediumAtmosphereMat;
+        [SerializeField] Material denseAtmosphereMat;
 
         MeshFilter _terrainFilter;
         // MeshFilter _waterFilter;
@@ -44,7 +49,21 @@ namespace CelestialBodies
         public void GenerateMesh(MeshData meshData)
         {
             _meshData = meshData;
-            _terrainFilter.sharedMesh = meshData.Ico.ToMesh();
+            _terrainFilter.sharedMesh = meshData.Ico.ToMesh(false);
+        }
+
+        public void SetGlobalWeatherConditions(GlobalWeatherConditions globalWeatherConditions)
+        {
+            _globalWeatherConditions = globalWeatherConditions;
+
+            MeshRenderer meshRenderer = atmosphereMeshFilter.GetComponent<MeshRenderer>();
+
+            float a = globalWeatherConditions.AtmosphericDensity;
+
+            if (a < 0.25f) meshRenderer.enabled = false;
+            else if (a < 0.5f) meshRenderer.sharedMaterial = lightAtmosphereMat;
+            else if (a < 0.75f) meshRenderer.sharedMaterial = mediumAtmosphereMat;
+            else if (a <= 1) meshRenderer.sharedMaterial = denseAtmosphereMat;
         }
 
         public void SetVertexWeatherConditions(VertexWeatherConditions weatherConditions)

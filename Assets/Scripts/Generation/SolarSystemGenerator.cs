@@ -14,13 +14,13 @@ using Random = UnityEngine.Random;
 /// <summary>
 /// Used to generate sun and planets
 /// </summary>
-public class SolarSystemGenerator : MonoBehaviour
+public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
 {
     [Header("Solar System Settings")] [SerializeField]
     float sunSize = 2;
 
     [SerializeField] int planetsToSpawn = 10;
-    [SerializeField] float distForZeroTemperature = 50;
+    [SerializeField] float distForZeroTemperature = 32;
 
     [SerializeField] MinMaxValue planetSizeRange;
     [SerializeField] MinMaxValue distanceRatioBetweenPlanets;
@@ -45,7 +45,7 @@ public class SolarSystemGenerator : MonoBehaviour
     Planet planetPrefab;
 
     [SerializeField] Sun sun;
-    List<Planet> _planets = new List<Planet>();
+    public List<Planet> Planets { get; private set; } = new List<Planet>();
 
     [SerializeField, Range(0f, 10f)] float timeScale = 1;
 
@@ -58,7 +58,6 @@ public class SolarSystemGenerator : MonoBehaviour
     void Update() => Time.timeScale = timeScale;
 
     void GenerateSun(float size) => sun.SetSize(size);
-
 
     void GeneratePlanets()
     {
@@ -113,41 +112,45 @@ public class SolarSystemGenerator : MonoBehaviour
             CreatePlanetAsync(planetDatas[i], weatherConditions[i]);
         }
 
-        Debug.Log("start finised");
+        // Debug.Log("start finised");
     }
 
-    async void CreatePlanetAsync(Planet.TransformData data, Planet.GlobalWeatherConditions weatherConditions)
+    async void CreatePlanetAsync(Planet.TransformData transformData, Planet.GlobalWeatherConditions globalWeatherConditions)
     {
         Planet planet = Instantiate(planetPrefab, Vector3.zero, Quaternion.identity);
-        planet.SetTransformData(data);
-
+        planet.SetTransformData(transformData);
+        Planets.Add(planet);
+        
         //generate ico
         Icosahedron ico = Icosahedron.GenerateIcoSphere(planetResolution);
         NativeArray<float> noiseValues = new NativeArray<float>(ico.Vertices.Length, Allocator.TempJob);
         NativeArray<Vector3> vertices = ico.Vertices;
+        
+        //compute and apply elevation
+        Noise3DMapJob job = new Noise3DMapJob(planetElevationNoiseSettings, noiseValues, vertices);
+        await Task.Run(() => GenerateNoise(job));
+        for (int i = 0; i < ico.Vertices.Length; i++) ico.Vertices[i] *= (1 + noiseValues[i]);
 
         Planet.MeshData meshData = new Planet.MeshData(ico, noiseValues.ToArray());
         planet.GenerateMesh(meshData);
 
-        Debug.Log("Planet instance created");
-
-        //compute and apply elevation
-        Noise3DMapJob job = new Noise3DMapJob(planetElevationNoiseSettings, noiseValues, vertices);
-        await GenerateNoise(job);
-        for (int i = 0; i < ico.Vertices.Length; i++) ico.Vertices[i] *= (1 + noiseValues[i]);
+        // Debug.Log("Planet instance created");
 
         //compute biome and weather values
         Planet.VertexWeatherConditions vertexWeatherConditions =
-            BiomeGenerator.Instance.GeneratePlanetBiomes(weatherConditions, meshData);
+            BiomeGenerator.Instance.GeneratePlanetBiomes(globalWeatherConditions, meshData);
         planet.SetVertexWeatherConditions(vertexWeatherConditions);
-        
+        planet.SetGlobalWeatherConditions(globalWeatherConditions);
+
         Debug.Log("Planet Generated");
     }
 
     Task GenerateNoise(Noise3DMapJob job)
     {
-        JobHandle handle = job.Schedule();
-        handle.Complete();
+        job.Execute();
+        // Debug.Log("task complete");
+        // JobHandle handle = job.Schedule();
+        // handle.Complete();
         return Task.CompletedTask;
     }
 

@@ -10,7 +10,7 @@ namespace MeshGeneration
         public NativeArray<int> Indices;
         public NativeArray<Vector3> Vertices;
 
-        public Mesh ToMesh()
+        public Mesh ToMesh(bool smoothormals = true)
         {
             Mesh m = new Mesh();
 
@@ -18,7 +18,8 @@ namespace MeshGeneration
             m.indexFormat = IndexFormat.UInt32;
             m.vertices = Vertices.ToArray();
             m.SetIndices(Indices.ToArray(), MeshTopology.Triangles, 0);
-            m.normals = SmoothNormals();
+            if(smoothormals) m.normals = SmoothNormals();
+            else m.RecalculateNormals();
             return m;
         }
 

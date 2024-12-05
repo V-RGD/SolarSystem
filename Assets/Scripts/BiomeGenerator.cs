@@ -35,7 +35,7 @@ public class BiomeGenerator : GenericSingletonClass<BiomeGenerator>
             latitude = Mathf.Abs(vertex.y);
     
             //compute base vertex values
-            e = meshData.Displacements[i] / globalConditions.MaxElevation + 0.5f;
+            e = (meshData.Displacements[i] / globalConditions.MaxElevation) + 0.5f;
             t = globalConditions.GlobalTemperature;
             h = globalConditions.GlobalHumidity;
             h = 0;
@@ -74,7 +74,7 @@ public class BiomeGenerator : GenericSingletonClass<BiomeGenerator>
             var biome = Biomes[i];
             float score = 0;
             score += Mathf.Abs(biome.temperature - t);
-            // score += Mathf.Abs(biome.habitability - t);
+            score += Mathf.Abs(biome.habitability - t);
 
             if (score < bestScore)
             {

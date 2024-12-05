@@ -74,7 +74,7 @@ public static class Perlin3D
     {
         return d * d * d * (d * (d * 6f - 15f) + 10f);
     }
-    
+
     // float direction000X;
     // float direction100X;
     // float direction010X;
@@ -102,53 +102,53 @@ public static class Perlin3D
     // float direction011Z;
     // float direction111Z;
 
-    static int flooredPointX0;
-    static int flooredPointY0;
-    static int flooredPointZ0;
-
-    static float distanceX0;
-    static float distanceY0;
-    static float distanceZ0;
-    static float distanceX1;
-    static float distanceY1;
-    static float distanceZ1;
-
-    static int flooredPointX1;
-    static int flooredPointY1;
-    static int flooredPointZ1;
-
-    static int permutationX0;
-    static int permutationX1;
-    static int permutationY00;
-    static int permutationY10;
-    static int permutationY01;
-    static int permutationY11;
-
-    static Vector3 direction000;
-    static Vector3 direction100;
-    static Vector3 direction010;
-    static Vector3 direction110;
-    static Vector3 direction001;
-    static Vector3 direction101;
-    static Vector3 direction011;
-    static Vector3 direction111;
-
-    static float value000;
-    static float value100;
-    static float value010;
-    static float value110;
-    static float value001;
-    static float value101;
-    static float value011;
-    static float value111;
-
-    static float smoothDistanceX;
-    static float smoothDistanceY;
-    static float smoothDistanceZ;
-
-    static float pointX;
-    static float pointY;
-    static float pointZ;
+    // static int flooredPointX0;
+    // static int flooredPointY0;
+    // static int flooredPointZ0;
+    //
+    // static float distanceX0;
+    // static float distanceY0;
+    // static float distanceZ0;
+    // static float distanceX1;
+    // static float distanceY1;
+    // static float distanceZ1;
+    //
+    // static int flooredPointX1;
+    // static int flooredPointY1;
+    // static int flooredPointZ1;
+    //
+    // static int permutationX0;
+    // static int permutationX1;
+    // static int permutationY00;
+    // static int permutationY10;
+    // static int permutationY01;
+    // static int permutationY11;
+    //
+    // static Vector3 direction000;
+    // static Vector3 direction100;
+    // static Vector3 direction010;
+    // static Vector3 direction110;
+    // static Vector3 direction001;
+    // static Vector3 direction101;
+    // static Vector3 direction011;
+    // static Vector3 direction111;
+    //
+    // static float value000;
+    // static float value100;
+    // static float value010;
+    // static float value110;
+    // static float value001;
+    // static float value101;
+    // static float value011;
+    // static float value111;
+    //
+    // static float smoothDistanceX;
+    // static float smoothDistanceY;
+    // static float smoothDistanceZ;
+    //
+    // static float pointX;
+    // static float pointY;
+    // static float pointZ;
 
     public static float Get3DPerlinNoise(float x, float y, float z, float frequency)
     {
@@ -156,57 +156,58 @@ public static class Perlin3D
         y *= frequency;
         z *= frequency;
 
-        flooredPointX0 = Mathf.FloorToInt(x);
-        flooredPointY0 = Mathf.FloorToInt(y);
-        flooredPointZ0 = Mathf.FloorToInt(z);
+        int flooredPointX0 = Mathf.FloorToInt(x);
+        int flooredPointY0 = Mathf.FloorToInt(y);
+        int flooredPointZ0 = Mathf.FloorToInt(z);
 
-        distanceX0 = x - flooredPointX0;
-        distanceY0 = y - flooredPointY0;
-        distanceZ0 = z - flooredPointZ0;
+        float distanceX0 = x - flooredPointX0;
+        float distanceY0 = y - flooredPointY0;
+        float distanceZ0 = z - flooredPointZ0;
 
-        distanceX1 = distanceX0 - 1f;
-        distanceY1 = distanceY0 - 1f;
-        distanceZ1 = distanceZ0 - 1f;
+        float distanceX1 = distanceX0 - 1f;
+        float distanceY1 = distanceY0 - 1f;
+        float distanceZ1 = distanceZ0 - 1f;
 
         flooredPointX0 &= PermutationCount;
         flooredPointY0 &= PermutationCount;
         flooredPointZ0 &= PermutationCount;
 
-        flooredPointX1 = flooredPointX0 + 1;
-        flooredPointY1 = flooredPointY0 + 1;
-        flooredPointZ1 = flooredPointZ0 + 1;
+        int flooredPointX1 = flooredPointX0 + 1;
+        int flooredPointY1 = flooredPointY0 + 1;
+        int flooredPointZ1 = flooredPointZ0 + 1;
 
-        permutationX0 = permutations[flooredPointX0];
-        permutationX1 = permutations[flooredPointX1];
+        int permutationX0 = permutations[flooredPointX0];
+        int permutationX1 = permutations[flooredPointX1];
 
-        permutationY00 = permutations[permutationX0 + flooredPointY0];
-        permutationY10 = permutations[permutationX1 + flooredPointY0];
-        permutationY01 = permutations[permutationX0 + flooredPointY1];
-        permutationY11 = permutations[permutationX1 + flooredPointY1];
+        int permutationY00 = permutations[permutationX0 + flooredPointY0];
+        int permutationY10 = permutations[permutationX1 + flooredPointY0];
+        int permutationY01 = permutations[permutationX0 + flooredPointY1];
+        int permutationY11 = permutations[permutationX1 + flooredPointY1];
 
-        direction000 = directions[permutations[permutationY00 + flooredPointZ0] & DirectionCount];
-        direction100 = directions[permutations[permutationY10 + flooredPointZ0] & DirectionCount];
-        direction010 = directions[permutations[permutationY01 + flooredPointZ0] & DirectionCount];
-        direction110 = directions[permutations[permutationY11 + flooredPointZ0] & DirectionCount];
-        direction001 = directions[permutations[permutationY00 + flooredPointZ1] & DirectionCount];
-        direction101 = directions[permutations[permutationY10 + flooredPointZ1] & DirectionCount];
-        direction011 = directions[permutations[permutationY01 + flooredPointZ1] & DirectionCount];
-        direction111 = directions[permutations[permutationY11 + flooredPointZ1] & DirectionCount];
+        Vector3 direction000 = directions[permutations[permutationY00 + flooredPointZ0] & DirectionCount];
+        Vector3 direction100 = directions[permutations[permutationY10 + flooredPointZ0] & DirectionCount];
+        Vector3 direction010 = directions[permutations[permutationY01 + flooredPointZ0] & DirectionCount];
+        Vector3 direction110 = directions[permutations[permutationY11 + flooredPointZ0] & DirectionCount];
+        Vector3 direction001 = directions[permutations[permutationY00 + flooredPointZ1] & DirectionCount];
+        Vector3 direction101 = directions[permutations[permutationY10 + flooredPointZ1] & DirectionCount];
+        Vector3 direction011 = directions[permutations[permutationY01 + flooredPointZ1] & DirectionCount];
+        Vector3 direction111 = directions[permutations[permutationY11 + flooredPointZ1] & DirectionCount];
 
-        value000 = Scalar(direction000, distanceX0, distanceY0, distanceZ0);
-        value100 = Scalar(direction100, distanceX1, distanceY0, distanceZ0);
-        value010 = Scalar(direction010, distanceX0, distanceY1, distanceZ0);
-        value110 = Scalar(direction110, distanceX1, distanceY1, distanceZ0);
-        value001 = Scalar(direction001, distanceX0, distanceY0, distanceZ1);
-        value101 = Scalar(direction101, distanceX1, distanceY0, distanceZ1);
-        value011 = Scalar(direction011, distanceX0, distanceY1, distanceZ1);
-        value111 = Scalar(direction111, distanceX1, distanceY1, distanceZ1);
+        float value000 = Scalar(direction000, distanceX0, distanceY0, distanceZ0);
+        float value100 = Scalar(direction100, distanceX1, distanceY0, distanceZ0);
+        float value010 = Scalar(direction010, distanceX0, distanceY1, distanceZ0);
+        float value110 = Scalar(direction110, distanceX1, distanceY1, distanceZ0);
+        float value001 = Scalar(direction001, distanceX0, distanceY0, distanceZ1);
+        float value101 = Scalar(direction101, distanceX1, distanceY0, distanceZ1);
+        float value011 = Scalar(direction011, distanceX0, distanceY1, distanceZ1);
+        float value111 = Scalar(direction111, distanceX1, distanceY1, distanceZ1);
 
-        smoothDistanceX = SmoothDistance(distanceX0);
-        smoothDistanceY = SmoothDistance(distanceY0);
-        smoothDistanceZ = SmoothDistance(distanceZ0);
+        float smoothDistanceX = SmoothDistance(distanceX0);
+        float smoothDistanceY = SmoothDistance(distanceY0);
+        float smoothDistanceZ = SmoothDistance(distanceZ0);
 
-        return Lerp(Lerp(Lerp(value000, value100, smoothDistanceX), Lerp(value010, value110, smoothDistanceX), smoothDistanceY),
+        return Lerp(
+            Lerp(Lerp(value000, value100, smoothDistanceX), Lerp(value010, value110, smoothDistanceX), smoothDistanceY),
             Lerp(Lerp(value001, value101, smoothDistanceX), Lerp(value011, value111, smoothDistanceX), smoothDistanceY),
             smoothDistanceZ);
     }

@@ -9,7 +9,7 @@ namespace JobQueries
     /// <summary>
     /// Used to compute large amounts of noise
     /// </summary>
-    public struct Noise3DMapJob : IJob
+    public struct Noise3DMapJob
     {
         public NoiseMapSettings Settings;
         public NativeArray<float> NoiseValues;
