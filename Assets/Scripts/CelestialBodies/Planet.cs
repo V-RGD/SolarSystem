@@ -57,7 +57,7 @@ namespace CelestialBodies
             _globalWeatherConditions = globalWeatherConditions;
 
             MeshRenderer meshRenderer = atmosphereMeshFilter.GetComponent<MeshRenderer>();
-
+            
             float a = globalWeatherConditions.AtmosphericDensity;
 
             if (a < 0.25f) meshRenderer.enabled = false;

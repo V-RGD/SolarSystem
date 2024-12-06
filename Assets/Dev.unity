@@ -169,6 +169,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2441dc643cbd88c4799e7cdbfa856f2d, type: 2}
   - {fileID: 11400000, guid: d1cdd9504e7955d49a2f9cb3ba68e185, type: 2}
   - {fileID: 11400000, guid: 8fd5734a240d7de4d9c525b2843d6cda, type: 2}
+  - {fileID: 11400000, guid: edd68cbc3b854bb4bbcc384131ed0ece, type: 2}
   - {fileID: 11400000, guid: dc71f0945a399184cb2098e5827e4785, type: 2}
   temperatureByLatitude:
     serializedVersion: 2
@@ -176,29 +177,20 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.062111992
-      outSlope: -0.062111992
-      tangentMode: 0
+      inSlope: -0.5010376
+      outSlope: -0.5010376
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.40911716
-    - serializedVersion: 3
-      time: 0.8962388
-      value: 0.92193776
-      inSlope: -0.12041919
-      outSlope: -0.39022282
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.9535094
-      outWeight: 0.531876
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 0.6397705
-      inSlope: -8.485426
-      outSlope: -8.485426
-      tangentMode: 0
+      value: 0.4989624
+      inSlope: -0.5010376
+      outSlope: -0.5010376
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 1
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -209,29 +201,20 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.062111992
-      outSlope: -0.062111992
-      tangentMode: 0
+      inSlope: -0.5010376
+      outSlope: -0.5010376
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.40911716
-    - serializedVersion: 3
-      time: 0.8962388
-      value: 0.92193776
-      inSlope: -0.12041919
-      outSlope: -0.39022282
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.9535094
-      outWeight: 0.531876
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 0.5010376
-      inSlope: -8.485426
-      outSlope: -8.485426
-      tangentMode: 0
+      value: 0.4989624
+      inSlope: -0.5010376
+      outSlope: -0.5010376
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 1
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -242,29 +225,20 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.062111992
-      outSlope: -0.062111992
+      inSlope: -0.9971406
+      outSlope: -0.9971406
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.40911716
-    - serializedVersion: 3
-      time: 0.8962388
-      value: 0.92193776
-      inSlope: -0.12041919
-      outSlope: -0.39022282
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.9535094
-      outWeight: 0.531876
+      outWeight: 0.99663866
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -8.485426
-      outSlope: -8.485426
+      inSlope: -1.0067681
+      outSlope: -1.0067681
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
+      inWeight: 0.9932773
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -1598,17 +1572,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sunSize: 2
   planetsToSpawn: 4
-  distForZeroTemperature: 32
+  planetDistanceRange:
+    min: 7
+    max: 32
   planetSizeRange:
     min: 0.1
     max: 0.5
-  distanceRatioBetweenPlanets:
-    min: 7
-    max: 10
   planetResolution: 8
   planetElevationNoiseSettings:
     freq: 5
-    octaves: 3
+    octaves: 4
     multiplier: 0.025
     seed: 0
   planetTemperatureByDistance:
@@ -1623,15 +1596,6 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.37083334
-    - serializedVersion: 3
-      time: 0.7849849
-      value: 0.8034533
-      inSlope: -0.68790257
-      outSlope: -0.68790257
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.08792394
-      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 0
@@ -1715,7 +1679,7 @@ MonoBehaviour:
     max: 60
   planetPrefab: {fileID: 9073119104354831331, guid: 56f4308380bb90841aaec6accd3c5092, type: 3}
   sun: {fileID: 312757775}
-  timeScale: 1
+  timeScale: 0.3
 --- !u!1 &1823435702
 GameObject:
   m_ObjectHideFlags: 0

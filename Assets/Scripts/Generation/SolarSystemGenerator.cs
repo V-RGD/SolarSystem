@@ -20,10 +20,10 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
     float sunSize = 2;
 
     [SerializeField] int planetsToSpawn = 10;
-    [SerializeField] float distForZeroTemperature = 32;
+    [SerializeField] MinMaxValue planetDistanceRange;
 
     [SerializeField] MinMaxValue planetSizeRange;
-    [SerializeField] MinMaxValue distanceRatioBetweenPlanets;
+    // [SerializeField] MinMaxValue distanceRatioBetweenPlanets;
 
     [Header("Planet Settings")] [SerializeField, Range(0, 8)]
     int planetResolution = 7;
@@ -70,14 +70,15 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
         //     new PlanetCreationJob.TerrainSettings(planetResolution, planetElevationNoiseSettings);
 
         float lastPlanetDist = 0;
-        float lastPlanetSize = sunSize;
+        // float lastPlanetSize = sunSize;
+        float spacing = (planetDistanceRange.max - planetDistanceRange.min) / planetsToSpawn;
 
         for (int i = 0; i < planetsToSpawn; i++)
         {
             float size = Random.Range(planetSizeRange.min, planetSizeRange.max);
 
             //puts it at a safe distance from the last planet (or sun, if none)
-            float distance = lastPlanetDist + (distanceRatioBetweenPlanets.RandomValue() * lastPlanetSize);
+            float distance = lastPlanetDist + spacing;
 
             float tilt = planetTiltRepartition.Evaluate(Random.value) * 90;
             if (SRnd.NextBool()) tilt *= -1;
@@ -88,7 +89,7 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
             //adds planet generation data
             planetDatas.Add(new Planet.TransformData(size, distance, tilt, rotationSpeed));
 
-            float t = planetTemperatureByDistance.Evaluate(Mathf.InverseLerp(0, distForZeroTemperature, distance));
+            float t = planetTemperatureByDistance.Evaluate(Mathf.InverseLerp(planetDistanceRange.min, planetDistanceRange.max, distance));
 
             Planet.GlobalWeatherConditions conditions = new Planet.GlobalWeatherConditions(t, SRnd.NextFloat(),
                 SRnd.NextFloat(), planetElevationNoiseSettings.multiplier);
@@ -100,7 +101,7 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
             // PlanetCreationJob newJob = new PlanetCreationJob(terrainSettings, conditions);
             // planetQueries.Add(newJob);
 
-            lastPlanetSize = size;
+            // lastPlanetSize = size;
             lastPlanetDist = distance;
         }
 
@@ -154,9 +155,11 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
         return Task.CompletedTask;
     }
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, distForZeroTemperature);
+        Gizmos.DrawWireSphere(transform.position, planetDistanceRange.min);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, planetDistanceRange.max);
     }
 }

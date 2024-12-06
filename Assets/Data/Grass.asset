@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Grass
   m_EditorClassIdentifier: 
   label: 
-  vertexColor: {r: 0.31166995, g: 0.4528302, b: 0.28408688, a: 1}
+  vertexColor: {r: 0.4513536, g: 0.6415094, b: 0.25720897, a: 1}
   temperature: 0.5
   habitability: 0
