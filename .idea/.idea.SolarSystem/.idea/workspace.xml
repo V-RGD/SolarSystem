@@ -89,7 +89,7 @@
       <option name="presentableId" value="Default" />
       <updated>1733391188286</updated>
       <workItem from="1733391189907" duration="7424000" />
-      <workItem from="1733478164913" duration="305000" />
+      <workItem from="1733478164913" duration="6785000" />
     </task>
     <servers />
   </component>
@@ -105,24 +105,5 @@
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Scripts/JobQueries/PlanetCreationJob.cs</url>
-          <line>71</line>
-          <properties documentPath="D:\Fork\SolarSystem\Assets\Scripts\JobQueries\PlanetCreationJob.cs" containingFunctionPresentation="Method 'Execute'">
-            <startOffsets>
-              <option value="2215" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2271" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

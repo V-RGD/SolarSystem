@@ -225,20 +225,20 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.9971406
-      outSlope: -0.9971406
-      tangentMode: 0
+      inSlope: -0.5010376
+      outSlope: -0.5010376
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.99663866
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 0
-      inSlope: -1.0067681
-      outSlope: -1.0067681
-      tangentMode: 0
+      value: 0.4989624
+      inSlope: -0.5010376
+      outSlope: -0.5010376
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0.9932773
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -505,24 +505,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2187507318303997833, guid: ba2709e0eac576c41919d264c8a800ee, type: 3}
-      propertyPath: m_Intensity
-      value: 1939.95
+      propertyPath: m_ColorTemperature
+      value: 4697
       objectReference: {fileID: 0}
     - target: {fileID: 2197081048117569517, guid: ba2709e0eac576c41919d264c8a800ee, type: 3}
       propertyPath: m_Name
       value: Sun
       objectReference: {fileID: 0}
-    - target: {fileID: 2197081048117569517, guid: ba2709e0eac576c41919d264c8a800ee, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 3051659658103961332, guid: ba2709e0eac576c41919d264c8a800ee, type: 3}
+      propertyPath: m_VolumetricDimmer
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3051659658103961332, guid: ba2709e0eac576c41919d264c8a800ee, type: 3}
-      propertyPath: m_ShadowResolution.m_Level
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3051659658103961332, guid: ba2709e0eac576c41919d264c8a800ee, type: 3}
-      propertyPath: m_ShadowResolution.m_UseOverride
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1053,7 +1045,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 4.89
+  m_Intensity: 85.68998
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1208,13 +1200,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1439759946}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalPosition: {x: 0, y: 12.94, z: -20.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!114 &1439759950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1234,9 +1226,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   volumeAnchorOverride: {fileID: 0}
-  antialiasing: 0
+  antialiasing: 1
   SMAAQuality: 2
-  dithering: 0
+  dithering: 1
   stopNaNs: 0
   taaSharpenStrength: 0.5
   TAAQuality: 1
@@ -1571,10 +1563,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sunSize: 2
-  planetsToSpawn: 4
+  planetsToSpawn: 8
   planetDistanceRange:
     min: 7
-    max: 32
+    max: 45
   planetSizeRange:
     min: 0.1
     max: 0.5

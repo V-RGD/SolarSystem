@@ -7,7 +7,6 @@ using JobQueries;
 using MeshGeneration;
 using NaughtyAttributes;
 using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -69,16 +68,15 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
         // PlanetCreationJob.TerrainSettings terrainSettings =
         //     new PlanetCreationJob.TerrainSettings(planetResolution, planetElevationNoiseSettings);
 
-        float lastPlanetDist = 0;
         // float lastPlanetSize = sunSize;
         float spacing = (planetDistanceRange.max - planetDistanceRange.min) / planetsToSpawn;
+        float distance = planetDistanceRange.min;
 
         for (int i = 0; i < planetsToSpawn; i++)
         {
             float size = Random.Range(planetSizeRange.min, planetSizeRange.max);
 
             //puts it at a safe distance from the last planet (or sun, if none)
-            float distance = lastPlanetDist + spacing;
 
             float tilt = planetTiltRepartition.Evaluate(Random.value) * 90;
             if (SRnd.NextBool()) tilt *= -1;
@@ -102,7 +100,7 @@ public class SolarSystemGenerator : GenericSingletonClass<SolarSystemGenerator>
             // planetQueries.Add(newJob);
 
             // lastPlanetSize = size;
-            lastPlanetDist = distance;
+            distance += spacing;
         }
 
         // NativeArray<JobHandle> handles = new NativeArray<JobHandle>(planetQueries.Count, Allocator.TempJob);

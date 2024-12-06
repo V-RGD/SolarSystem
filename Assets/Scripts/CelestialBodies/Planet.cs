@@ -49,7 +49,7 @@ namespace CelestialBodies
         public void GenerateMesh(MeshData meshData)
         {
             _meshData = meshData;
-            _terrainFilter.sharedMesh = meshData.Ico.ToMesh(false);
+            _terrainFilter.sharedMesh = meshData.Ico.ToMesh(true);
         }
 
         public void SetGlobalWeatherConditions(GlobalWeatherConditions globalWeatherConditions)
