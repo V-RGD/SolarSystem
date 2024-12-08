@@ -96,7 +96,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTexture:
-        m_Texture: {fileID: 2800000, guid: e315f847f1e17e849931c191ba02b7bc, type: 3}
+        m_Texture: {fileID: 2800000, guid: 77020e3d1265e894eadc1e02e23e0026, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTexture2:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
@@ -185,7 +189,7 @@ Material:
     - _DoubleSidedNormalMode: 1
     - _DstBlend: 0
     - _DstBlend2: 0
-    - _Emission: 10000
+    - _Emission: 1000
     - _EmissiveColorMode: 1
     - _EmissiveExposureWeight: 1
     - _EmissiveIntensity: 1
@@ -213,8 +217,9 @@ Material:
     - _Metallic: 0
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0
-    - _NoiseEmissiveSub: 1
-    - _NoiseScale: 0.5
+    - _NoiseEmissiveSub: 0.23
+    - _NoiseMultiply: 40
+    - _NoiseScale: 2
     - _NoiseSpeed: 0.00625
     - _NormalMapSpace: 0
     - _NormalScale: 1
@@ -227,7 +232,7 @@ Material:
     - _PPDPrimitiveLength: 1
     - _PPDPrimitiveWidth: 1
     - _PerPixelSorting: 0
-    - _Pow: 1
+    - _Pow: 0.1
     - _RayTracing: 0
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
@@ -271,12 +276,15 @@ Material:
     - _UVEmissive: 0
     - _UseEmissiveIntensity: 0
     - _UseShadowThreshold: 0
+    - _VertexDisplacement: 0.02
+    - _VertexDisplacementScale: 10000
+    - _VertexDisplacementSpeed: 0.00005
     - _ZTestDepthEqualForOpaque: 3
     - _ZTestGBuffer: 4
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 0.95067954, b: 0.5322728, a: 1}
+    - _BaseColor: {r: 1, g: 0.048927687, b: 0, a: 1}
     - _Color: {r: 1, g: 0.2954944, b: 0, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
