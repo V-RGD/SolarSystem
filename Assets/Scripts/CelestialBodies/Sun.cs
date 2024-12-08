@@ -1,3 +1,4 @@
+using System;
 using CelestialBodies;
 using UnityEngine;
 
@@ -6,14 +7,36 @@ using UnityEngine;
 /// </summary>
 public class Sun : CelestialBody
 {
+    [SerializeField] Gradient colorGradient;
+    [SerializeField] MinMaxValue sizeRange;
     [SerializeField] Light sunLight;
-    [SerializeField] Gradient colorRange;
-    
-    public void SetSize(float size)
+
+    public void SetSize(float sizeRatio, float colorRatio)
     {
-        // Color sunColor = colorRange.Evaluate(Random.value);
-        // GetComponent<MeshRenderer>().sharedMaterial.color = sunColor;
-        // sunLight.color = sunColor;
-        // transform.localScale = Vector3.one * size;
+        //set size
+        transform.localScale = sizeRange.Lerp(sizeRatio) * Vector3.one;
+
+        //set color
+        Color sunColor = colorGradient.Evaluate(colorRatio);
+        GetComponent<MeshRenderer>().material.SetColor("_BaseColor", sunColor);
+        sunLight.color = sunColor;
     }
+
+    // public enum GrowthType
+    // {
+    //     Temperature,
+    //     Size
+    // }
+    //
+    // public void UpdateMass(float mass, GrowthType growthType)
+    // {
+    //     if (growthType is GrowthType.Size)
+    //     {
+    //         //increases sun size
+    //     }
+    //     if (growthType is GrowthType.Temperature)
+    //     {
+    //         //updates color
+    //     }
+    // }
 }

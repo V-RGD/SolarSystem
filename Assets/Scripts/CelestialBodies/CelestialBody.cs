@@ -7,39 +7,57 @@ namespace CelestialBodies
     /// </summary>
     public class CelestialBody : MonoBehaviour
     {
-        [field: SerializeField] public float RotationSpeed { get; protected set; } = 25;
-        public float Tilt { get; protected set; } = 24;
-        public float OrbitalDistance { get; protected set; } = 0;
-        public float OrbitalPeriod { get; protected set; } = 60;
-
-        float _axialRotation;
-        protected float CurrentOrbitAngle;
-
-        void Update()
-        {
-            UpdateRotation();
-            UpdatePos();
-        }
-
-        void UpdateRotation()
-        {
-            _axialRotation += Time.deltaTime * RotationSpeed;
-            transform.localRotation = Quaternion.Euler(Tilt, 0, 0) * Quaternion.Euler(0, _axialRotation, 0);
-            if (_axialRotation > 360) _axialRotation -= 360;
-        }
-
-        void UpdatePos()
-        {
-            if(OrbitalPeriod == 0 || OrbitalDistance == 0) return;
-            
-            CurrentOrbitAngle += Time.deltaTime;
-            float orbitalAngle = CurrentOrbitAngle % 360 / ((float)OrbitalPeriod / 360);
-            if (CurrentOrbitAngle > 360) CurrentOrbitAngle -= 360;
-            
-            Vector3 position = Vector3.forward * OrbitalDistance;
-            position = Quaternion.AngleAxis(orbitalAngle, Vector3.up) * position;
-
-            transform.position = position;
-        }
+        // [field: SerializeField] public Transform Parent { get; set; }
+        //
+        // public Orbit OrbitSettings { get; set; }
+        //
+        // public class Orbit
+        // {
+        //     public int Index;
+        //     public Transform Center;
+        //
+        //     public float BarycenterAngle;
+        //     public float OrbitAngle;
+        //
+        //     // public float Period;
+        // }
+        //
+        // public void SetOrbit(Transform center, int index)
+        // {
+        //     OrbitSettings.Center = center;
+        //     OrbitSettings.Index = index;
+        // }
+        //
+        // // public float OrbitalDistance { get; set; } = 0;
+        // // public float OrbitalPeriod { get; set; } = 60;
+        // // float _axialRotation;
+        // // protected float currentOrbitAngle;
+        //
+        // public void UpdateSimulation(float speed)
+        // {
+        //     UpdateRotation(speed);
+        //     UpdatePos(speed);
+        // }
+        //
+        // void UpdateRotation(float speed)
+        // {
+        //     // _axialRotation += speed * AxialRotationSpeed;
+        //     // transform.localRotation = Quaternion.Euler(RotationTilt, 0, 0) * Quaternion.Euler(0, _axialRotation, 0);
+        //     // if (_axialRotation > 360) _axialRotation -= 360;
+        // }
+        //
+        // void UpdatePos(float speed)
+        // {
+        //     // if (OrbitalPeriod == 0 || OrbitalDistance == 0) return;
+        //     //
+        //     // currentOrbitAngle += speed;
+        //     // float orbitalAngle = currentOrbitAngle % 360 / ((float)OrbitalPeriod / 360);
+        //     // if (currentOrbitAngle > 360) currentOrbitAngle -= 360;
+        //     //
+        //     // Vector3 position = Vector3.forward * OrbitalDistance;
+        //     // position = Quaternion.AngleAxis(orbitalAngle, Vector3.up) * position;
+        //     //
+        //     // transform.position = position;
+        // }
     }
 }
