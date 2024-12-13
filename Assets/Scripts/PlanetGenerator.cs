@@ -1,13 +1,17 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CelestialBodies;
+using Generation;
 using UnityEngine;
 
-public class PlanetGenerator : MonoBehaviour
+public class PlanetGenerator : GenericSingletonClass<PlanetGenerator>
 {
     [SerializeField] TerrestrialPlanet terrestrialPlanetPrefab;
     [SerializeField] GazPlanet gazPlanetPrefab;
     [SerializeField] MinMaxValue planetsToGenerate;
+
+    [field: SerializeField, Range(0, 8)] public int PlanetResolution { get; private set; } = 5;
+    [field: SerializeField]public NoiseMapSettings PlanetTerrainSettings { get;private set; }
 
     public async Task GeneratePlanets()
     {
@@ -32,7 +36,9 @@ public class PlanetGenerator : MonoBehaviour
 
     async Task<Planet> CreateTerrestrialPlanet()
     {
-        return Instantiate(terrestrialPlanetPrefab);
+        Planet planet = Instantiate(terrestrialPlanetPrefab);
+        await planet.InitialisePlanet();
+        return planet;
     }
 
     async Task<Planet> CreateGazPlanet()

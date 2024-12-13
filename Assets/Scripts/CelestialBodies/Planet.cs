@@ -1,14 +1,18 @@
 ﻿using System.Threading.Tasks;
+using MeshGeneration;
+using UnityEngine;
 
 namespace CelestialBodies
 {
     public abstract class Planet : CelestialBody
     {
+        
         public virtual async Task InitialisePlanet()
         {
             
-        }
 
+        }
+        
         // [SerializeField] bool randomizeEclipticPos;
         // [SerializeField] MeshFilter waterMeshFilter;
         // [SerializeField] MeshFilter atmosphereMeshFilter;

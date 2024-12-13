@@ -25,6 +25,11 @@ namespace JobQueries
         public void Execute()
         {
             ComputeNoiseValues();
+
+            for (int i = 0; i < NoiseValues.Length; i++)
+            {
+                Positions[i] *= (1 + NoiseValues[i]);
+            }
         }
 
         void ComputeNoiseValues()

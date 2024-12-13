@@ -19,7 +19,7 @@ public class Sun : CelestialBody
         //set color
         Color sunColor = colorGradient.Evaluate(colorRatio);
         GetComponent<MeshRenderer>().material.SetColor("_BaseColor", sunColor);
-        sunLight.color = sunColor;
+        // sunLight.color = sunColor;
     }
 
     // public enum GrowthType
