@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -13,7 +14,7 @@ namespace MeshGeneration
         public Mesh ToMesh(bool smoothormals = true)
         {
             Mesh m = new Mesh();
-
+            
             //Creates submeshes
             m.indexFormat = IndexFormat.UInt32;
             m.vertices = Vertices.ToArray();
@@ -98,13 +99,13 @@ namespace MeshGeneration
             };
         }
 
-        public static Icosahedron GenerateIcoSphere(int subdivisions)
+        public static async Task<Icosahedron> GenerateIcoSphere(int subdivisions)
         {
             //create icosahedron, then subdivides it
             Icosahedron ico = GenerateDefaultIcosahedron();
             for (int i = 0; i < subdivisions; i++)
             {
-                ico.Subdivide();
+                await ico.Subdivide();
             }
 
             return ico;
@@ -119,7 +120,7 @@ namespace MeshGeneration
             return normals;
         }
 
-        public void Subdivide()
+        public Task Subdivide()
         {
             NativeArray<int> newIndices = new NativeArray<int>(Indices.Length / 3 * 12, Allocator.TempJob);
             NativeArray<Vector3> newVerts = new NativeArray<Vector3>(Indices.Length / 3 * 6, Allocator.TempJob);
@@ -168,6 +169,8 @@ namespace MeshGeneration
 
             for (int i = 0; i < newIndices.Length; i++) Indices[i] = newIndices[i];
             for (int i = 0; i < newVerts.Length; i++) Vertices[i] = newVerts[i];
+            
+            return Task.CompletedTask;
         }
     }
 }

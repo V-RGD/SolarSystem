@@ -302,11 +302,11 @@ MonoBehaviour:
   terrestrialPlanetPrefab: {fileID: 6522581756232777994, guid: 9c3f736deb52c5b4982a19a2ca8afce7, type: 3}
   gazPlanetPrefab: {fileID: 436995607246720981, guid: ee7cf2743914ec849a670b2b35df0322, type: 3}
   planetsToGenerate:
-    min: 5
-    max: 5
-  <PlanetResolution>k__BackingField: 8
+    min: 10
+    max: 10
+  <PlanetResolution>k__BackingField: 7
   <PlanetTerrainSettings>k__BackingField:
-    freq: 1
+    freq: 5
     octaves: 5
     multiplier: 0.1
     seed: 0

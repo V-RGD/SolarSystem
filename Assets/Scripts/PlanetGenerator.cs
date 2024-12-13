@@ -10,8 +10,8 @@ public class PlanetGenerator : GenericSingletonClass<PlanetGenerator>
     [SerializeField] GazPlanet gazPlanetPrefab;
     [SerializeField] MinMaxValue planetsToGenerate;
 
-    [field: SerializeField, Range(0, 8)] public int PlanetResolution { get; private set; } = 5;
-    [field: SerializeField]public NoiseMapSettings PlanetTerrainSettings { get;private set; }
+    [field: SerializeField, Range(0, 9)] public int PlanetResolution { get; private set; } = 9;
+    [field: SerializeField] public NoiseMapSettings PlanetTerrainSettings { get;private set; }
 
     public async Task GeneratePlanets()
     {
@@ -31,13 +31,13 @@ public class PlanetGenerator : GenericSingletonClass<PlanetGenerator>
 
     async Task<Planet> CreateNewPlanet()
     {
-        return SRnd.NextBool() ? await CreateGazPlanet() : await CreateTerrestrialPlanet();
+        // return SRnd.NextBool() ? await CreateGazPlanet() : await CreateTerrestrialPlanet();
+        return await CreateTerrestrialPlanet();
     }
 
     async Task<Planet> CreateTerrestrialPlanet()
     {
         Planet planet = Instantiate(terrestrialPlanetPrefab);
-        await planet.InitialisePlanet();
         return planet;
     }
 

@@ -9,19 +9,19 @@ namespace JobQueries
     /// <summary>
     /// Used to compute large amounts of noise
     /// </summary>
-    public struct Noise3DMapJob
+    public struct ComputeNoiseValuesJob : IJob
     {
         public NoiseMapSettings Settings;
         public NativeArray<float> NoiseValues;
         public NativeArray<Vector3> Positions;
 
-        public Noise3DMapJob(NoiseMapSettings settings, NativeArray<float> noiseValues, NativeArray<Vector3> positions)
+        public ComputeNoiseValuesJob(NoiseMapSettings settings, NativeArray<float> noiseValues, NativeArray<Vector3> positions)
         {
             Settings = settings;
             NoiseValues = noiseValues;
             Positions = positions;
         }
-
+        
         public void Execute()
         {
             ComputeNoiseValues();

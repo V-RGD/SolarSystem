@@ -13,7 +13,7 @@ namespace TerrainGeneration
             for (int i = 0; i < octaves; ++i)
             {
                 noise += Perlin3D.Get3DPerlinNoise(x, y, z, frequency) * contribution;
-                // noise += Noise.CalcPixel3D(x, y, z, frequency) *contribution;
+                // noise += Noise.CalcPixel3D(x, y, z, frequency) * contribution;
                 contribution *= 0.5f;
                 frequency *= 2.0f;
             }
