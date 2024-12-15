@@ -1,5 +1,6 @@
 ﻿using Generation;
 using TerrainGeneration;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -9,19 +10,20 @@ namespace JobQueries
     /// <summary>
     /// Used to compute large amounts of noise
     /// </summary>
-    public struct ComputeNoiseValuesJob : IJob
+    [BurstCompile]
+    public struct Compute3DNoiseJob : IJob, IFlushNativeArrays
     {
         public NoiseMapSettings Settings;
         public NativeArray<float> NoiseValues;
         public NativeArray<Vector3> Positions;
 
-        public ComputeNoiseValuesJob(NoiseMapSettings settings, NativeArray<float> noiseValues, NativeArray<Vector3> positions)
+        public Compute3DNoiseJob(NoiseMapSettings settings, NativeArray<Vector3> positions)
         {
             Settings = settings;
-            NoiseValues = noiseValues;
             Positions = positions;
+            NoiseValues = new NativeArray<float>(positions.Length, Allocator.TempJob);
         }
-        
+
         public void Execute()
         {
             ComputeNoiseValues();
@@ -41,10 +43,15 @@ namespace JobQueries
             for (int i = 0; i < arrayLength; i++)
             {
                 vert = Positions[i];
-                value = NoiseMapSampler.SampleNoise3D(vert.x, vert.y, vert.z, Settings.freq, Settings.octaves,
-                    Settings.seed);
+                value = NoiseMapSampler.SampleNoise3D(vert.x, vert.y, vert.z, Settings.freq, Settings.octaves, Settings.seed);
                 NoiseValues[i] = value * Settings.multiplier;
             }
+        }
+
+        public void Flush()
+        {
+            NoiseValues.Dispose();
+            Positions.Dispose();
         }
     }
 }

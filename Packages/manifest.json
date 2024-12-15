@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "com.cysharp.csprojmodifier": "file:C:/Users/HipsterCow/Downloads/CsprojModifier-master/CsprojModifier-master/src/CsprojModifier/Assets/CsprojModifier",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.feature.development": "1.0.2",
+    "com.unity.memoryprofiler": "1.1.3",
     "com.unity.multiplayer.center": "1.0.0",
     "com.unity.render-pipelines.high-definition": "17.0.3",
     "com.unity.render-pipelines.universal": "17.0.3",

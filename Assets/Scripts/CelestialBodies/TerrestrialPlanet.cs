@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JobQueries;
 using MeshGeneration;
 using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -17,89 +14,75 @@ namespace CelestialBodies
     {
         [SerializeField] MeshFilter terrainFilter;
         [SerializeField] MinMaxValue sizeRange;
-        // [SerializeField] MeshRenderer waterRenderer;
-        // [SerializeField] MeshRenderer atmosphereRenderer;
 
         public override async Task InitialisePlanet()
         {
             transform.localScale = sizeRange.Lerp(SRnd.NextFloat()) * Vector3.one;
-
-            int verticesCount = Mathf.CeilToInt(20 * Mathf.Pow(4, PlanetGenerator.Instance.PlanetResolution));
-            int chunks = Mathf.CeilToInt(Mathf.Sqrt(verticesCount));
             
-            Icosahedron ico = await Task.Run((() => GenerateTerrainWithJobs(chunks)));
-            // Icosahedron ico = await Task.Run((() => GenerateTerrainAsync()));
+            Icosahedron ico = await Task.Run((GenerateTerrainWithJobs));
+            
             terrainFilter.sharedMesh = ico.ToMesh(false);
         }
 
-        async Task<Icosahedron> GenerateTerrainWithJobs(int chunks)
+        async Task<Icosahedron> GenerateTerrainWithJobs()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            FlashClock duration = new FlashClock();
+            duration.Start();
             
-            Icosahedron ico = await Task.Run((() => Icosahedron.GenerateIcoSphere(PlanetGenerator.Instance.PlanetResolution)));
-            
-            stopwatch.Stop();
-            Debug.Log(stopwatch.ElapsedMilliseconds + "to create sphere");
-            stopwatch.Reset();
-            stopwatch.Start();
+            Icosahedron ico = await GenerateSphere(PlanetGenerator.Instance.PlanetResolution);
+            Debug.Log($"Sphere Creation : {duration.FlashReset()}");
 
-            int chunkSize = (int)ico.Vertices.Length / chunks;
-
-            NativeArray<ComputeNoiseValuesJob> jobs = new NativeArray<ComputeNoiseValuesJob>(chunkSize, Allocator.TempJob);
+            ico.Vertices = await GenerateTerrainNoise(ico, duration);
+            Debug.Log($"Array Set : {duration.FlashReset()}");
             
-            for (int i = 0; i < chunks; i++)
-            {
-                List<Vector3> verts = new List<Vector3>();
-                
-                //chunk verts
-                for (int j = 0; j < chunkSize; j++)
-                {
-                    int index = i * chunkSize + j;
-                    if(index >= ico.Vertices.Length) break;
-                    verts.Add(ico.Vertices[index]);
-                }
-                
-                //create job
-                jobs[i] = new ComputeNoiseValuesJob(PlanetGenerator.Instance.PlanetTerrainSettings, new NativeArray<float>(verts.Count, Allocator.TempJob), 
-                    verts.ToNativeArray(Allocator.TempJob));
-            }
-
-            NativeArray<JobHandle> handles = new NativeArray<JobHandle>(chunks, Allocator.TempJob);
-
-            for (int i = 0; i < handles.Length; i++)
-            {
-                handles[i] = jobs[i].Schedule();
-            }
-            
-            JobHandle.CompleteAll(handles);
-            
-            stopwatch.Stop();
-            Debug.Log(stopwatch.ElapsedMilliseconds + "to compute noise");
-            stopwatch.Reset();
-            stopwatch.Start();
-
-            NativeArray<Vector3> elevatedVerts = new NativeArray<Vector3>(ico.Vertices.Length, Allocator.TempJob);
-            
-            for (int i = 0; i < chunks; i++)
-            {
-                //chunk verts
-                for (int j = 0; j < chunkSize; j++)
-                {
-                    int index = i * chunkSize + j;
-                    if(index >= ico.Vertices.Length) break;
-
-                    elevatedVerts[index] = jobs[i].Positions[j];
-                }
-            }
-            
-            stopwatch.Stop();
-            Debug.Log(stopwatch.ElapsedMilliseconds + "to set array");
-            
-            ico.Vertices = elevatedVerts;
             return ico;
         }
-        
+
+        async Task<NativeArray<Vector3>> GenerateTerrainNoise(Icosahedron ico, FlashClock duration)
+        {
+            Debug.Log($"A : {duration.FlashReset()}");
+            //divides vertices in chunks
+            NativeArrayDivider<Vector3> vertexChunks = new NativeArrayDivider<Vector3>(ico.Vertices);
+            int chunks = Mathf.CeilToInt(Mathf.Sqrt(ico.Vertices.Length));
+            vertexChunks.DivideIntensiveTask(chunks);
+            Debug.Log($"B : {duration.FlashReset()}");
+            
+            //creates noise jobs for each
+            NativeArray<Compute3DNoiseJob> noiseJobs = new NativeArray<Compute3DNoiseJob>(chunks, Allocator.TempJob);
+            for (int i = 0; i < chunks; i++)
+            {
+                //create job
+                noiseJobs[i] = new Compute3DNoiseJob(PlanetGenerator.Instance.PlanetTerrainSettings, vertexChunks.Chunks[i]);
+            }
+            
+            Debug.Log($"C : {duration.FlashReset()}");
+            
+            //computes noise
+            noiseJobs.ExecuteAll();
+            
+            Debug.Log($"Noise Compute : {duration.FlashReset()}");
+
+            NativeArray<Vector3> newVerts = new NativeArray<Vector3>(ico.Vertices.Length, Allocator.TempJob);
+            int index = 0;
+            for (int i = 0; i < chunks; i++)
+            {
+                //chunk verts
+                foreach (Vector3 vertex in noiseJobs[i].Positions)
+                {
+                    newVerts[index] = vertex;
+                    index++;
+                }
+            }
+            
+            return newVerts;
+        }
+
+        async Task<Icosahedron> GenerateSphere(int resolution)
+        {
+            return await Task.Run((() => Icosahedron.GenerateIcoSphere(resolution)));
+        }
+
+
         // async Task<Icosahedron> GenerateTerrainAsync()
         // {
         //     Stopwatch stopwatch = new Stopwatch();

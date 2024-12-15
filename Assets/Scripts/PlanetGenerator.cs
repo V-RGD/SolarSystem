@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CelestialBodies;
 using Generation;
+using JobQueries;
 using UnityEngine;
 
 public class PlanetGenerator : GenericSingletonClass<PlanetGenerator>
@@ -10,11 +11,14 @@ public class PlanetGenerator : GenericSingletonClass<PlanetGenerator>
     [SerializeField] GazPlanet gazPlanetPrefab;
     [SerializeField] MinMaxValue planetsToGenerate;
 
-    [field: SerializeField, Range(0, 9)] public int PlanetResolution { get; private set; } = 9;
+    [field: SerializeField, Range(0, 12)] public int PlanetResolution { get; private set; } = 9;
     [field: SerializeField] public NoiseMapSettings PlanetTerrainSettings { get;private set; }
 
     public async Task GeneratePlanets()
     {
+        FlashClock clock = new FlashClock();
+        clock.Start();
+        
         int planetsAmount = Mathf.RoundToInt(planetsToGenerate.RandomValue());
 
         for (int i = 0; i < planetsAmount; i++)
@@ -27,6 +31,8 @@ public class PlanetGenerator : GenericSingletonClass<PlanetGenerator>
                 planet
             }));
         }
+        
+        Debug.Log($"total generation time {clock.FlashReset()}");
     }
 
     async Task<Planet> CreateNewPlanet()
