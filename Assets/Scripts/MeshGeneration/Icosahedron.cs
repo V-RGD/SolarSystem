@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Helpers;
 using JobQueries;
 using Unity.Collections;
 using Unity.Jobs;
@@ -13,18 +12,21 @@ namespace MeshGeneration
     {
         public NativeArray<int> Indices;
         public NativeArray<Vector3> Vertices;
+        public NativeArray<Color> Colors;
         public int subdivisionCount;
 
         public Mesh ToMesh(bool smoothNormals = false)
         {
             Mesh m = new Mesh();
-
+            
             //Creates submeshes
             m.indexFormat = IndexFormat.UInt32;
-            m.vertices = Vertices.ToArray();
-            m.SetIndices(Indices.ToArray(), MeshTopology.Triangles, 0);
-            if (smoothNormals) m.normals = SmoothNormals();
-            else m.RecalculateNormals();
+            m.SetVertices(Vertices);
+            m.SetIndices(Indices, MeshTopology.Triangles, 0);
+            m.SetColors(Colors);
+
+            m.RecalculateNormals();
+
             return m;
         }
 
@@ -144,145 +146,105 @@ namespace MeshGeneration
 
             return Task.CompletedTask;
         }
-
-        // Task SubdivideWithJobs()
-        // {
-        //     int batchCount = 2;
-        //     int vertsPerBatch = Vertices.Length / batchCount;
-        //     int indicesPerBatch = vertsPerBatch * 2;
-        //     
-        //     PrettyLogs.LogMultiple(new []{vertsPerBatch, indicesPerBatch}, new []{"Verts Batch", "Index Batch"});
-        //     
-        //     NativeArray<SubdivisionJob> subdivisionJobs = new NativeArray<SubdivisionJob>(batchCount, Allocator.TempJob);
-        //
-        //     //for each chunk
-        //     for (int i = 0; i < batchCount; i++)
-        //     {
-        //         NativeArray<Vector3> verts = new NativeArray<Vector3>(vertsPerBatch, Allocator.TempJob);
-        //         NativeArray<int> indices = new NativeArray<int>(indicesPerBatch, Allocator.TempJob);
-        //
-        //         //builds a list of tris and indices
-        //         for (int j = 0; j < vertsPerBatch; j++)
-        //         {
-        //             int index = i * vertsPerBatch + j;
-        //             if (index >= Vertices.Length) break;
-        //             verts[j] = Vertices[index];
-        //         }
-        //         //builds a list of tris and indices
-        //         for (int j = 0; j < indicesPerBatch; j++)
-        //         {
-        //             int index = i * indicesPerBatch + j;
-        //             if (index >= Indices.Length) break;
-        //             indices[j] = Indices[index];
-        //         }
-        //
-        //         int inputOffset = i * vertsPerBatch;
-        //         int outputOffset = i * indicesPerBatch;
-        //
-        //         //create job
-        //         subdivisionJobs[i] = new SubdivisionJob(indices, verts, inputOffset, outputOffset);
-        //     }
-        //     
-        //     PrettyLogs.Log(Indices.Length, "old indices");
-        //     PrettyLogs.Log(Vertices.Length, "old vertices");
-        //
-        //     //execute computations
-        //     subdivisionJobs.ExecuteAll();
-        //
-        //     //merge indices and vertices arrays
-        //     Vertices.Dispose();
-        //     Indices.Dispose();
-        //
-        //     List<NativeArray<int>> indexArrayList = new List<NativeArray<int>>();
-        //     List<NativeArray<Vector3>> vertexArrayList = new List<NativeArray<Vector3>>();
-        //
-        //     for (int i = 0; i < subdivisionJobs.Length; i++)
-        //     {
-        //         indexArrayList.Add(subdivisionJobs[i].OutputIndices);
-        //         vertexArrayList.Add(subdivisionJobs[i].OutputVerts);
-        //     }
-        //
-        //     Indices = indexArrayList.Merge();
-        //     Vertices = vertexArrayList.Merge();
-        //
-        //     return Task.CompletedTask;
-        // }
-
-        public Task Subdivide()
+        
+        
+        public void ReshadeFlat()
         {
-            NativeArray<int> newIndices = new NativeArray<int>(Indices.Length / 3 * 12, Allocator.TempJob);
-            NativeArray<Vector3> newVerts = new NativeArray<Vector3>(Indices.Length / 3 * 6, Allocator.TempJob);
+            NativeArray<Vector3> newVertices = new NativeArray<Vector3>(Indices.Length, Allocator.TempJob);
+            NativeArray<Color> newColors = new NativeArray<Color>(Indices.Length, Allocator.TempJob);
+            NativeArray<int> newTris = new NativeArray<int>(Indices.Length, Allocator.TempJob);
 
-            int indiceIndex = 0;
-            int vertexArrayIndex = 0;
-
-            Vector3 a;
-            Vector3 b;
-            Vector3 c;
-            Vector3 x;
-            Vector3 y;
-            Vector3 z;
-
-            int vertexIndex;
-            int[] indicesToAdd;
-
-            //for each tri
+            //for each triangle
             for (int i = 0; i < Indices.Length; i += 3)
             {
-                //take the three vertices that form the triangle
-                a = Vertices[Indices[i]];
-                b = Vertices[Indices[i + 1]];
-                c = Vertices[Indices[i + 2]];
+                //adds three new separate vertices and their indices
+                newVertices[i] = Vertices[Indices[i]];
+                newVertices[i + 1] = Vertices[Indices[i + 1]];
+                newVertices[i + 2] = Vertices[Indices[i + 2]];
 
-                //take middle points of the vertices
-                x = ((a + b) * 0.5f).normalized;
-                y = ((b + c) * 0.5f).normalized;
-                z = ((c + a) * 0.5f).normalized;
-
-                //add new vertices to the array
-                vertexIndex = vertexArrayIndex;
-
-                newVerts[vertexArrayIndex] = a;
-                newVerts[vertexArrayIndex + 1] = b;
-                newVerts[vertexArrayIndex + 2] = c;
-                newVerts[vertexArrayIndex + 3] = x;
-                newVerts[vertexArrayIndex + 4] = y;
-                newVerts[vertexArrayIndex + 5] = z;
-                vertexArrayIndex += 6;
-
-                //connects new triangles
-                indicesToAdd = new int[]
-                {
-                    0, 3, 5, 3, 1, 4, 3, 4, 5, 5, 4, 2
-                };
-                foreach (int index in indicesToAdd)
-                {
-                    newIndices[indiceIndex] = index + vertexIndex;
-                    indiceIndex++;
-                }
+                //and their corresponding indices
+                newTris[i] = i;
+                newTris[i + 1] = i + 1;
+                newTris[i + 2] = i + 2;
+                
+                //keep color data
+                newColors[i] = Colors[Indices[i]];
+                newColors[i + 1] = Colors[Indices[i + 1]];
+                newColors[i + 2] = Colors[Indices[i + 2]];
             }
 
-            Indices = new NativeArray<int>(newIndices.Length, Allocator.TempJob);
-            Vertices = new NativeArray<Vector3>(newVerts.Length, Allocator.TempJob);
-
-            for (int i = 0; i < newIndices.Length; i++) Indices[i] = newIndices[i];
-            for (int i = 0; i < newVerts.Length; i++) Vertices[i] = newVerts[i];
-
-            return Task.CompletedTask;
+            Vertices = newVertices;
+            Indices = newTris;
+            Colors = newColors;
         }
-
-        Vector3[] SmoothNormals()
-        {
-            Vector3[] normals = new Vector3[Vertices.Length];
-            for (int i = 0; i < Vertices.Length; i++) normals[i] = Vertices[i].normalized;
-            return normals;
-        }
-
 
         public void Flush()
         {
             Indices.Dispose();
             Vertices.Dispose();
         }
+
+        // public Task Subdivide()
+        // {
+        //     NativeArray<int> newIndices = new NativeArray<int>(Indices.Length / 3 * 12, Allocator.TempJob);
+        //     NativeArray<Vector3> newVerts = new NativeArray<Vector3>(Indices.Length / 3 * 6, Allocator.TempJob);
+        //
+        //     int indiceIndex = 0;
+        //     int vertexArrayIndex = 0;
+        //
+        //     Vector3 a;
+        //     Vector3 b;
+        //     Vector3 c;
+        //     Vector3 x;
+        //     Vector3 y;
+        //     Vector3 z;
+        //
+        //     int vertexIndex;
+        //     int[] indicesToAdd;
+        //
+        //     //for each tri
+        //     for (int i = 0; i < Indices.Length; i += 3)
+        //     {
+        //         //take the three vertices that form the triangle
+        //         a = Vertices[Indices[i]];
+        //         b = Vertices[Indices[i + 1]];
+        //         c = Vertices[Indices[i + 2]];
+        //
+        //         //take middle points of the vertices
+        //         x = ((a + b) * 0.5f).normalized;
+        //         y = ((b + c) * 0.5f).normalized;
+        //         z = ((c + a) * 0.5f).normalized;
+        //
+        //         //add new vertices to the array
+        //         vertexIndex = vertexArrayIndex;
+        //
+        //         newVerts[vertexArrayIndex] = a;
+        //         newVerts[vertexArrayIndex + 1] = b;
+        //         newVerts[vertexArrayIndex + 2] = c;
+        //         newVerts[vertexArrayIndex + 3] = x;
+        //         newVerts[vertexArrayIndex + 4] = y;
+        //         newVerts[vertexArrayIndex + 5] = z;
+        //         vertexArrayIndex += 6;
+        //
+        //         //connects new triangles
+        //         indicesToAdd = new int[]
+        //         {
+        //             0, 3, 5, 3, 1, 4, 3, 4, 5, 5, 4, 2
+        //         };
+        //         foreach (int index in indicesToAdd)
+        //         {
+        //             newIndices[indiceIndex] = index + vertexIndex;
+        //             indiceIndex++;
+        //         }
+        //     }
+        //
+        //     Indices = new NativeArray<int>(newIndices.Length, Allocator.TempJob);
+        //     Vertices = new NativeArray<Vector3>(newVerts.Length, Allocator.TempJob);
+        //
+        //     for (int i = 0; i < newIndices.Length; i++) Indices[i] = newIndices[i];
+        //     for (int i = 0; i < newVerts.Length; i++) Vertices[i] = newVerts[i];
+        //
+        //     return Task.CompletedTask;
+        // }
     }
 }

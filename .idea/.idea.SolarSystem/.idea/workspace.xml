@@ -19,6 +19,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1a34d7ee85f44ff2a9df5d0ea5a6ee325735b0/d5/96eb8e45/IndexOutOfRangeException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/321eb2db7c6d43ea8fc39b54eaca345246ae00/17/481a22b2/Task.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b5bf0c891ea345fe93688f835df32fdc1dda00/7e/6afe23d8/NativeArray`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3ea01e77be99618395f448b16bd7cc2bd4248bd9e5d8474964b2d97f39c5d74/System.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CelestialBodies/GazPlanet.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CelestialBodies/Sun.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/JobQueries/NativeArrayDivider.cs" root0="FORCE_HIGHLIGHTING" />
@@ -82,10 +83,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="34520">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="48764">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="34520" />
+      <option name="pid" value="48764" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
@@ -107,7 +108,7 @@
       <workItem from="1733522918500" duration="36514000" />
       <workItem from="1733669852768" duration="2449000" />
       <workItem from="1734098856852" duration="18726000" />
-      <workItem from="1734185189140" duration="26162000" />
+      <workItem from="1734185189140" duration="37769000" />
     </task>
     <servers />
   </component>

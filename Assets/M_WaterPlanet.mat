@@ -201,7 +201,7 @@ Material:
     - _Surface: 0
     - _SurfaceType: 0
     - _TextureNoiseScale: 0.96
-    - _TextureNoiseSpeed: 0.01
+    - _TextureNoiseSpeed: 0.002
     - _TransmissionEnable: 1
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2

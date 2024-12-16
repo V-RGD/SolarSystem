@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c411edc1e6d8ad146a5a6e763fc454f7, type: 2}
+  - {fileID: 2100000, guid: 80b01c05d21a9774c9acd63d4ede606a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,6 +106,36 @@ MonoBehaviour:
   sizeRange:
     min: 0.2
     max: 0.7
+  colorGradient:
+    serializedVersion: 2
+    key0: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 1}
+    key1: {r: 0.3301887, g: 0.26727042, b: 0.11681204, a: 1}
+    key2: {r: 1, g: 0.9756764, b: 0.75, a: 0}
+    key3: {r: 0, g: 1, b: 0.14795828, a: 0}
+    key4: {r: 0, g: 0.3490566, b: 0.28499404, a: 0}
+    key5: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 0}
+    key6: {r: 1, g: 1, b: 1, a: 0}
+    key7: {r: 1, g: 1, b: 1, a: 0}
+    ctime0: 0
+    ctime1: 10794
+    ctime2: 31997
+    ctime3: 42405
+    ctime4: 48959
+    ctime5: 52814
+    ctime6: 65535
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: 0
+    m_NumColorKeys: 7
+    m_NumAlphaKeys: 2
 --- !u!1 &6435519782965902880
 GameObject:
   m_ObjectHideFlags: 0

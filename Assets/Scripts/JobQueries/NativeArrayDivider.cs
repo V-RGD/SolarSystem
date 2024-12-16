@@ -20,14 +20,18 @@ namespace JobQueries
             Chunks = new NativeArray<T>[divisions];
 
             int element = 0;
+            int elementsLeft = Original.Length;
             
             for (int i = 0; i < divisions; i++)
             {
-                int size = elementsPerDivision;
-                if (i < divisions) size = Original.Length % divisions;
-                NativeArray<T> subdivision = new NativeArray<T>(size, Allocator.TempJob);
+                int elementsToSet = elementsLeft < elementsPerDivision ? elementsLeft : elementsPerDivision;
+                elementsLeft -= elementsPerDivision;
                 
-                for (int j = 0; j < size; j++)
+                // int size = elementsPerDivision;
+                // if (i >= divisions - 1) size = Original.Length % divisions;
+                NativeArray<T> subdivision = new NativeArray<T>(elementsToSet, Allocator.TempJob);
+                
+                for (int j = 0; j < elementsToSet; j++)
                 {
                     subdivision[j] = Original[element];
                     element++;
